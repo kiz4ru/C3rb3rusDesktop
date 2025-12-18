@@ -33,17 +33,31 @@ upgrade_system() {
     log_warning "Esto puede tardar varios minutos dependiendo de tu conexión..."
     echo -e "${BLUE}[●●●●●●●●●●] Procesando actualizaciones...${NC}"
     
+    # Verificar y reparar dependencias rotas primero
+    if ! sudo dpkg --configure -a 2>&1 | tee -a /tmp/c3rb3rus_upgrade.log; then
+        log_warning "Detectadas configuraciones pendientes, reparando..."
+    fi
+    
+    if ! sudo apt --fix-broken install -y 2>&1 | tee -a /tmp/c3rb3rus_upgrade.log; then
+        log_warning "Reparando dependencias rotas..."
+    fi
+    
     # Usar full-upgrade para Kali (recomendado oficialmente)
     # -y: aceptar automáticamente
     # --allow-downgrades: permitir downgrade si es necesario
-    sudo apt full-upgrade -y --allow-downgrades 2>&1 | \
-        tee /tmp/c3rb3rus_upgrade.log | \
+    if sudo apt full-upgrade -y --allow-downgrades 2>&1 | tee /tmp/c3rb3rus_upgrade.log | \
         while IFS= read -r line; do
             echo "$line" | grep -qE "(Preparing|Unpacking|Setting up|Processing)" && echo -ne "\r${BLUE}[▓▓▓▓▓▓▓▓▓▓] $line${NC}\033[K" || echo "$line"
-        done
-    echo ""
-    
-    log_success "Sistema actualizado correctamente"
+        done; then
+        echo ""
+        log_success "Sistema actualizado correctamente"
+    else
+        echo ""
+        log_warning "Actualización completada con advertencias"
+        log_info "Puedes revisar el log en: /tmp/c3rb3rus_upgrade.log"
+        # No fallar, continuar con la instalación
+        return 0
+    fi
 }
 
 #############################################################

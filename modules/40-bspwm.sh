@@ -258,33 +258,18 @@ EOF
 create_bspwm_session() {
     log_info "Creando sesión de login para bspwm..."
     
-    # Crear wrapper script que ejecuta bspwmrc
-    sudo tee /usr/local/bin/bspwm-session > /dev/null << 'EOF'
-#!/bin/bash
-# C3rb3rusDesktop - bspwm session wrapper
-
-# Cargar configuración de usuario
-if [ -f "$HOME/.config/bspwm/bspwmrc" ]; then
-    exec "$HOME/.config/bspwm/bspwmrc"
-else
-    # Fallback a config por defecto
-    exec /usr/bin/bspwm
-fi
-EOF
-    sudo chmod +x /usr/local/bin/bspwm-session
-    
-    # Crear archivo de sesión
+    # Crear archivo de sesión directamente (bspwm carga ~/.config/bspwm/bspwmrc automáticamente)
     sudo tee /usr/share/xsessions/bspwm.desktop > /dev/null << 'EOF'
 [Desktop Entry]
-Name=bspwm
-Comment=Binary Space Partitioning Window Manager
-Exec=/usr/local/bin/bspwm-session
-Icon=bspwm
+Name=C3rb3rus (bspwm)
+Comment=C3rb3rusDesktop - Binary Space Partitioning Window Manager
+Exec=/usr/bin/bspwm
 Type=Application
 DesktopNames=bspwm
 EOF
     
-    log_success "Sesión de bspwm configurada correctamente"
+    log_success "Sesión de bspwm registrada correctamente"
+    log_info "💡 bspwm cargará automáticamente ~/.config/bspwm/bspwmrc"
 }
 
 #############################################################
