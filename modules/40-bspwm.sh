@@ -161,8 +161,21 @@ create_bspwm_config() {
         if [[ -d "$wallpaper_source" ]]; then
             mkdir -p "$bspwm_dir/wallpapers"
             cp -r "$wallpaper_source"/* "$bspwm_dir/wallpapers/" 2>/dev/null || true
+            
+            # Crear symlink a wallpaper predeterminado si existe
+            if [[ -f "$bspwm_dir/wallpapers/current.jpg" ]] || [[ -L "$bspwm_dir/wallpapers/current.jpg" ]]; then
+                log_info "Wallpaper predeterminado: current.jpg"
+            else
+                # Buscar primer wallpaper disponible y crear symlink
+                first_wallpaper=$(find "$bspwm_dir/wallpapers" -type f \( -name "*.jpg" -o -name "*.png" \) | head -1)
+                if [[ -n "$first_wallpaper" ]]; then
+                    ln -sf "$(basename "$first_wallpaper")" "$bspwm_dir/wallpapers/current.jpg"
+                    log_info "Wallpaper predeterminado: $(basename "$first_wallpaper")"
+                fi
+            fi
+            
             log_info "Carpeta wallpapers copiada a ~/.config/bspwm/wallpapers"
-            log_info "💡 Para cambiar wallpaper: edita ~/.config/bspwm/wallpapers/wallpaper.jpg"
+            log_info "💡 Cambiar wallpaper: ln -sf nombre.jpg ~/.config/bspwm/wallpapers/current.jpg"
         fi
         
         # Copiar documentación
@@ -245,17 +258,33 @@ EOF
 create_bspwm_session() {
     log_info "Creando sesión de login para bspwm..."
     
+    # Crear wrapper script que ejecuta bspwmrc
+    sudo tee /usr/local/bin/bspwm-session > /dev/null << 'EOF'
+#!/bin/bash
+# C3rb3rusDesktop - bspwm session wrapper
+
+# Cargar configuración de usuario
+if [ -f "$HOME/.config/bspwm/bspwmrc" ]; then
+    exec "$HOME/.config/bspwm/bspwmrc"
+else
+    # Fallback a config por defecto
+    exec /usr/bin/bspwm
+fi
+EOF
+    sudo chmod +x /usr/local/bin/bspwm-session
+    
+    # Crear archivo de sesión
     sudo tee /usr/share/xsessions/bspwm.desktop > /dev/null << 'EOF'
 [Desktop Entry]
 Name=bspwm
 Comment=Binary Space Partitioning Window Manager
-Exec=bspwm
+Exec=/usr/local/bin/bspwm-session
 Icon=bspwm
 Type=Application
 DesktopNames=bspwm
 EOF
     
-    log_success "Sesión de bspwm disponible en login screen"
+    log_success "Sesión de bspwm configurada correctamente"
 }
 
 #############################################################

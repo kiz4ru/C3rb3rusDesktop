@@ -11,21 +11,16 @@ pgrep -x polybar > /dev/null || ~/.config/polybar/launch.sh &
 pgrep -x picom > /dev/null || picom --config ~/.config/picom/picom.conf &
 pgrep -x dunst > /dev/null || dunst &
 
-# Set wallpaper
+# Set wallpaper (busca en orden: jpg -> png -> fallback)
 WALLPAPER_DIR="$HOME/.config/bspwm/wallpapers"
 
-if [[ -f "$WALLPAPER_DIR/current.jpg" ]]; then
-    feh --bg-fill "$WALLPAPER_DIR/current.jpg" &
-elif [[ -f "$WALLPAPER_DIR/current.png" ]]; then
-    feh --bg-fill "$WALLPAPER_DIR/current.png" &
+if [[ -f "$WALLPAPER_DIR/wallpaper.jpg" ]]; then
+    feh --bg-fill "$WALLPAPER_DIR/wallpaper.jpg"
+elif [[ -f "$WALLPAPER_DIR/wallpaper.png" ]]; then
+    feh --bg-fill "$WALLPAPER_DIR/wallpaper.png"
 else
-    # Fallback: buscar cualquier imagen
-    wallpaper=$(find "$WALLPAPER_DIR" -type f \( -name "*.jpg" -o -name "*.png" \) | head -1)
-    if [[ -n "$wallpaper" ]]; then
-        feh --bg-fill "$wallpaper" &
-    else
-        xsetroot -solid '#0a0e14'
-    fi
+    # Fallback: dark gradient si no hay wallpaper
+    xsetroot -solid '#0a0e14'
 fi
 
 # Cool matrix effect (opcional - comentar si no quieres)
