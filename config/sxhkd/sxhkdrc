@@ -1,0 +1,346 @@
+#############################################################
+# C3rb3rusDesktop - sxhkd Configuration
+# Atajos de teclado estilo Windows + Pentesting
+#############################################################
+
+#############################################################
+# BASIC KEYBINDINGS - Atajos básicos
+#############################################################
+
+# Terminal (Super + Enter)
+super + Return
+    kitty
+
+# Floating terminal (Super + Shift + Enter)
+super + shift + Return
+    kitty --class floating
+
+# Launcher (Super + Space)
+super + @space
+    rofi -show drun
+
+# Run command (Super + R)
+super + r
+    rofi -show run
+
+# Window switcher (Alt + Tab)
+alt + Tab
+    rofi -show window
+
+# SSH connections (Super + Shift + S)
+super + shift + s
+    rofi -show ssh
+
+#############################################################
+# SYSTEM CONTROL - Control del sistema
+#############################################################
+
+# Reload sxhkd
+super + Escape
+    pkill -USR1 -x sxhkd && notify-send "sxhkd" "Config reloaded"
+
+# Quit bspwm
+super + alt + q
+    bspc quit
+
+# Restart bspwm (Super + Shift + R)
+super + shift + r
+    bspc wm -r && notify-send "bspwm" "Restarted"
+
+#############################################################
+# WINDOW MANAGEMENT - Gestión de ventanas
+#############################################################
+
+# Close window (Alt + F4)
+alt + F4
+    bspc node -c
+
+# Kill window (Super + Q)
+super + q
+    bspc node -k
+
+# Toggle monocle layout (Super + M)
+super + m
+    bspc desktop -l next
+
+# Toggle fullscreen (F11)
+F11
+    bspc node -t ~fullscreen
+
+# Set window state
+super + {t,shift + t,s,f}
+    bspc node -t {tiled,pseudo_tiled,floating,~fullscreen}
+
+# Set node flags
+super + ctrl + {m,x,y,z}
+    bspc node -g {marked,locked,sticky,private}
+
+#############################################################
+# FOCUS/SWAP - Navegación y movimiento
+#############################################################
+
+# Focus window (Super + arrows)
+super + {Left,Down,Up,Right}
+    bspc node -f {west,south,north,east}
+
+# Focus window (Super + hjkl - vim style)
+super + {h,j,k,l}
+    bspc node -f {west,south,north,east}
+
+# Move window (Super + Shift + arrows)
+super + shift + {Left,Down,Up,Right}
+    bspc node -s {west,south,north,east}
+
+# Move window (Super + Shift + hjkl)
+super + shift + {h,j,k,l}
+    bspc node -s {west,south,north,east}
+
+# Focus next/previous window
+super + {_,shift + }c
+    bspc node -f {next,prev}.local.!hidden.window
+
+# Focus next/previous desktop
+super + bracket{left,right}
+    bspc desktop -f {prev,next}.local
+
+# Focus last window/desktop
+super + {grave,Tab}
+    bspc {node,desktop} -f last
+
+# Focus older/newer node in focus history
+super + {o,i}
+    bspc wm -h off; \
+    bspc node {older,newer} -f; \
+    bspc wm -h on
+
+#############################################################
+# RESIZE - Redimensionar ventanas
+#############################################################
+
+# Expand window (Super + Alt + arrows)
+super + alt + {Left,Down,Up,Right}
+    bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+
+# Contract window (Super + Alt + Shift + arrows)
+super + alt + shift + {Left,Down,Up,Right}
+    bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+
+# Move floating window (Super + Ctrl + arrows)
+super + ctrl + {Left,Down,Up,Right}
+    bspc node -v {-20 0,0 20,0 -20,20 0}
+
+#############################################################
+# PRESELECT - Preselección de división
+#############################################################
+
+# Preselect direction
+super + ctrl + alt + {Left,Down,Up,Right}
+    bspc node -p {west,south,north,east}
+
+# Preselect ratio
+super + ctrl + {1-9}
+    bspc node -o 0.{1-9}
+
+# Cancel preselection (Super + Ctrl + Space)
+super + ctrl + space
+    bspc node -p cancel
+
+# Cancel preselection for focused desktop
+super + ctrl + shift + space
+    bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
+
+#############################################################
+# WORKSPACES - Escritorios virtuales
+#############################################################
+
+# Switch workspace (Super + number)
+super + {1-9,0}
+    bspc desktop -f '^{1-9,10}'
+
+# Move window to workspace (Super + Shift + number)
+super + shift + {1-9,0}
+    bspc node -d '^{1-9,10}' --follow
+
+# Move window to workspace without following
+super + ctrl + shift + {1-9,0}
+    bspc node -d '^{1-9,10}'
+
+#############################################################
+# SCREENSHOTS - Capturas de pantalla
+#############################################################
+
+# Screenshot interactive (Print Screen)
+Print
+    flameshot gui
+
+# Screenshot full screen (Super + Print)
+super + Print
+    flameshot full -c -p ~/Pictures/screenshots
+
+# Screenshot window (Shift + Print)
+shift + Print
+    flameshot screen -c -p ~/Pictures/screenshots
+
+# Screenshot delayed 5s (Ctrl + Print)
+ctrl + Print
+    flameshot gui -d 5000
+
+#############################################################
+# APPLICATIONS - Aplicaciones
+#############################################################
+
+# File manager (Super + E)
+super + e
+    thunar
+
+# Browser (Super + W)
+super + w
+    firefox
+
+# Browser private (Super + Shift + W)
+super + shift + w
+    firefox --private-window
+
+# VS Code (Super + C)
+super + c
+    code
+
+# System monitor (Super + Shift + Escape)
+super + shift + Escape
+    kitty -e htop
+
+# Calculator
+super + equal
+    gnome-calculator
+
+#############################################################
+# MEDIA CONTROL - Control de medios
+#############################################################
+
+# Volume up
+XF86AudioRaiseVolume
+    amixer -q sset Master 5%+ && notify-send -t 1000 "Volume" "$(amixer sget Master | grep -oP '\d+%' | head -1)"
+
+# Volume down
+XF86AudioLowerVolume
+    amixer -q sset Master 5%- && notify-send -t 1000 "Volume" "$(amixer sget Master | grep -oP '\d+%' | head -1)"
+
+# Mute
+XF86AudioMute
+    amixer -q sset Master toggle && notify-send -t 1000 "Volume" "Muted"
+
+# Play/pause
+XF86AudioPlay
+    playerctl play-pause
+
+# Next track
+XF86AudioNext
+    playerctl next
+
+# Previous track
+XF86AudioPrev
+    playerctl previous
+
+# Stop
+XF86AudioStop
+    playerctl stop
+
+#############################################################
+# BRIGHTNESS - Brillo de pantalla
+#############################################################
+
+# Brightness up
+XF86MonBrightnessUp
+    xbacklight -inc 10 && notify-send -t 1000 "Brightness" "$(xbacklight -get | cut -d. -f1)%"
+
+# Brightness down
+XF86MonBrightnessDown
+    xbacklight -dec 10 && notify-send -t 1000 "Brightness" "$(xbacklight -get | cut -d. -f1)%"
+
+#############################################################
+# PENTESTING SHORTCUTS - Atajos para pentesting
+#############################################################
+
+# Burpsuite (Super + B)
+super + b
+    burpsuite
+
+# Wireshark (Super + Shift + W)
+super + shift + p
+    wireshark
+
+# Metasploit (Super + Shift + M)
+super + shift + m
+    kitty -e msfconsole
+
+# Ghidra (Super + G)
+super + g
+    ghidra
+
+# Nmap GUI (Super + N)
+super + n
+    zenmap
+
+#############################################################
+# VPN MANAGEMENT - Gestión de VPN
+#############################################################
+
+# VPN Status (Super + V)
+super + v
+    kitty --class floating -e bash -c '~/C3rb3rusDesktop/scripts/vpn/vpn_status.sh; read -p "Press ENTER to close..."'
+
+# Connect HTB (Super + Shift + H)
+super + shift + h
+    kitty --class floating -e ~/C3rb3rusDesktop/scripts/vpn/htb_connect.sh
+
+# Connect THM (Super + Shift + T)
+super + shift + t
+    kitty --class floating -e ~/C3rb3rusDesktop/scripts/vpn/thm_connect.sh
+
+# Disconnect VPN (Super + Shift + D)
+super + shift + d
+    sudo killall openvpn && notify-send "VPN" "Disconnected"
+
+#############################################################
+# TARGET MANAGEMENT - Gestión de targets
+#############################################################
+
+# Target Manager (Super + T)
+super + t
+    kitty --class floating -e ~/C3rb3rusDesktop/scripts/vpn/target_manager.sh
+
+# Quick set target (Super + Shift + I)
+super + shift + i
+    bash -c 'TARGET=$(rofi -dmenu -p "Target IP:"); [[ -n "$TARGET" ]] && echo "$TARGET" > ~/.config/bspwm/target_ip.txt && notify-send "Target Set" "$TARGET"'
+
+# Open target directory (Super + Shift + O)
+super + shift + o
+    bash -c 'IP=$(cat ~/.config/bspwm/target_ip.txt 2>/dev/null); [[ -n "$IP" ]] && DIR=$(find ~/pentesting/targets -name "*$IP*" -type d | head -1); [[ -n "$DIR" ]] && thunar "$DIR" || notify-send "Error" "No target set"'
+
+#############################################################
+# QUICK COMMANDS - Comandos rápidos
+#############################################################
+
+# Quick notes (Super + Shift + N)
+super + shift + n
+    kitty --class floating -e nvim ~/pentesting/notes/quick_notes.md
+
+# Keybindings help (Super + Shift + K)
+super + shift + k
+    kitty --class floating -e ~/.config/bspwm/scripts/keybindings-help.sh
+
+# Wallpaper Manager (Super + W + P)
+super + w ; p
+    kitty --class floating -e ~/.config/bspwm/scripts/wallpaper-manager.sh
+
+# Random wallpaper from collection (Super + W + R)
+super + w ; r
+    bash -c 'WALL=$(find ~/.config/bspwm/wallpapers -type f \( -name "*.jpg" -o -name "*.png" \) | shuf -n 1); [[ -n "$WALL" ]] && feh --bg-fill "$WALL" && notify-send "Wallpaper Changed" "Random: $(basename $WALL)"'
+
+# Copy IP addresses
+super + shift + c ; {v,t}
+    bash -c 'IP=$(ip -4 addr show {tun0,eth0} 2>/dev/null | grep inet | awk "{print \$2}" | cut -d/ -f1); echo -n "$IP" | xclip -selection clipboard && notify-send "Copied" "$IP"'
+
+# Screenshot + OCR (Super + O)
+super + o
+    flameshot gui --raw | tesseract stdin stdout | xclip -selection clipboard && notify-send "OCR" "Text copied to clipboard"

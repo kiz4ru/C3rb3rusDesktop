@@ -8,8 +8,7 @@
 set -euo pipefail
 
 # Cargar funciones de logging
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/validation.sh"
+# SCRIPT_DIR viene de install.sh cuando se ejecuta con source
 
 #############################################################
 # Actualización de repositorios
@@ -32,13 +31,17 @@ update_repositories() {
 upgrade_system() {
     log_info "Actualizando paquetes del sistema..."
     log_warning "Esto puede tardar varios minutos dependiendo de tu conexión..."
+    echo -e "${BLUE}[●●●●●●●●●●] Procesando actualizaciones...${NC}"
     
     # Usar full-upgrade para Kali (recomendado oficialmente)
     # -y: aceptar automáticamente
     # --allow-downgrades: permitir downgrade si es necesario
     sudo apt full-upgrade -y --allow-downgrades 2>&1 | \
         tee /tmp/c3rb3rus_upgrade.log | \
-        grep -E "upgraded|newly installed|to remove|not upgraded" || true
+        while IFS= read -r line; do
+            echo "$line" | grep -qE "(Preparing|Unpacking|Setting up|Processing)" && echo -ne "\r${BLUE}[▓▓▓▓▓▓▓▓▓▓] $line${NC}\033[K" || echo "$line"
+        done
+    echo ""
     
     log_success "Sistema actualizado correctamente"
 }

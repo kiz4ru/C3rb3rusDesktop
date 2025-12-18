@@ -23,7 +23,8 @@ C3rb3rusDesktop es un proyecto diseñado para transformar tu instalación de Kal
 - 🔐 **Herramientas VPN Integradas** - Conexión rápida a HTB/THM con monitoreo en Polybar
 - 🛠️ **Meta-paquetes de Pentesting** - Suite completa de herramientas Kali
 - 💻 **Entorno de Desarrollo** - Python, Neovim, VS Code, Kitty
-- 🎨 **Interfaz Moderna** - Polybar, Rofi, Picom con tema Dracula
+- 🎨 **Interfaz Cyberpunk** - Tema Neon inspirado en Matrix/hacker aesthetic
+- 🖼️ **Wallpapers Personalizables** - Sistema simple: cambia la imagen, no el código
 - 📦 **Instalación Modular** - Elige qué componentes instalar
 - 🔄 **Totalmente Reversible** - Backups automáticos antes de cambios
 - 🚫 **Nunca se ejecuta como root** - Buenas prácticas de seguridad
@@ -178,6 +179,21 @@ cd C3rb3rusDesktop
 echo "10.10.10.123" > ~/.config/bspwm/target_ip.txt
 ```
 
+### 3. Cambiar Wallpaper (Personalización Visual)
+```bash
+# Método simple - Solo reemplaza el archivo
+# 1. Copia tu wallpaper a la carpeta
+cp /ruta/a/tu/imagen.jpg ~/.config/bspwm/wallpapers/wallpaper.jpg
+
+# 2. Reinicia bspwm
+Super + Shift + R
+
+# O aplica inmediatamente sin reiniciar
+feh --bg-fill ~/.config/bspwm/wallpapers/wallpaper.jpg
+```
+**Formatos soportados**: JPG (prioridad), PNG (fallback)  
+**Carpeta wallpapers**: `~/.config/bspwm/wallpapers/` (README incluido)
+
 ### 3. Monitorear en Polybar
 La barra superior mostrará automáticamente:
 - 🔐 Estado VPN (IP de tun0/tun1)
@@ -200,29 +216,52 @@ La barra superior mostrará automáticamente:
 
 ---
 
-## ⌨️ Atajos de Teclado (bspwm)
+## ⌨️ Atajos de Teclado
 
-### Básicos
-- `Super + Enter` - Abrir terminal (Kitty)
-- `Super + Space` - Launcher (Rofi)
-- `Alt + F4` - Cerrar ventana
-- `Super + E` - Explorador de archivos
-- `Super + W` - Navegador
+### 📋 Ver Cheatsheet Completa
 
-### Navegación de Ventanas
-- `Super + ←↓↑→` - Cambiar foco
-- `Super + Shift + ←↓↑→` - Mover ventana
-- `Super + Alt + ←↓↑→` - Redimensionar ventana
+**Acceso rápido:**
+- 🔥 **Atajo**: `Super + Shift + K` (Abre el helper interactivo)
+- 📖 **Archivo**: `~/.config/bspwm/docs/KEYBINDINGS.md` (guía completa)
+- 💻 **Script**: `keybindings-help.sh` (menú interactivo)
 
-### Workspaces
-- `Super + [1-9]` - Cambiar a workspace
-- `Super + Shift + [1-9]` - Mover ventana a workspace
+```bash
+# Ver en terminal
+cat ~/.config/bspwm/docs/KEYBINDINGS.txt
 
-### Pentesting
-- `Super + V` - Ver estado VPN
-- `Super + B` - Abrir Burpsuite
-- `Super + Shift + W` - Abrir Wireshark
-- `Print` - Screenshot (Flameshot)
+# Helper interactivo (GUI en terminal)
+Super + Shift + K
+```
+
+### ⚡ Atajos Más Importantes
+
+**Básicos:**
+- `Super + Enter` → Terminal (Kitty)
+- `Super + Space` → Launcher (Rofi)
+- `Alt + F4` → Cerrar ventana
+- `Super + E` → Explorador de archivos
+
+**Navegación:**
+- `Super + ←↓↑→` → Cambiar foco
+- `Super + Shift + ←↓↑→` → Mover ventana
+- `Super + Alt + ←↓↑→` → Redimensionar
+
+**Workspaces:**
+- `Super + [1-9]` → Cambiar workspace
+- `Super + Shift + [1-9]` → Mover ventana
+
+**Pentesting:**
+- `Super + V` → Estado VPN
+- `Super + B` → Burpsuite
+- `Super + T` → Target Manager
+- `Print` → Screenshot
+
+**Sistema:**
+- `Super + Shift + K` → **Ver todos los atajos**
+- `Super + Shift + R` → Reiniciar bspwm
+- `Super + Escape` → Recargar keybindings
+
+> 📚 **Documentación completa**: 180+ atajos categorizados en [docs/KEYBINDINGS.md](docs/KEYBINDINGS.md)
 
 ---
 

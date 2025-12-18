@@ -8,9 +8,7 @@
 set -euo pipefail
 
 # Cargar funciones de logging
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-source "$SCRIPT_DIR/00-checks.sh"
+# SCRIPT_DIR y PROJECT_DIR vienen de install.sh cuando se ejecuta con source
 
 #############################################################
 # Instalar bspwm y componentes base
@@ -149,6 +147,8 @@ create_bspwm_config() {
     
     local bspwm_dir="$HOME/.config/bspwm"
     local config_source="$PROJECT_DIR/config/bspwm"
+    local wallpaper_source="$PROJECT_DIR/wallpapers"
+    local docs_source="$PROJECT_DIR/docs"
     
     mkdir -p "$bspwm_dir"
     
@@ -156,6 +156,22 @@ create_bspwm_config() {
     if [[ -d "$config_source" ]] && [[ "$(ls -A $config_source 2>/dev/null)" ]]; then
         cp -r "$config_source"/* "$bspwm_dir/"
         log_success "Configuración copiada desde $config_source"
+        
+        # Copiar carpeta de wallpapers
+        if [[ -d "$wallpaper_source" ]]; then
+            mkdir -p "$bspwm_dir/wallpapers"
+            cp -r "$wallpaper_source"/* "$bspwm_dir/wallpapers/" 2>/dev/null || true
+            log_info "Carpeta wallpapers copiada a ~/.config/bspwm/wallpapers"
+            log_info "💡 Para cambiar wallpaper: edita ~/.config/bspwm/wallpapers/wallpaper.jpg"
+        fi
+        
+        # Copiar documentación
+        if [[ -d "$docs_source" ]]; then
+            mkdir -p "$bspwm_dir/docs"
+            cp -r "$docs_source"/* "$bspwm_dir/docs/" 2>/dev/null || true
+            log_info "📖 Documentación copiada a ~/.config/bspwm/docs"
+            log_info "💡 Ver atajos: Super + Shift + K"
+        fi
     else
         # Crear configuración básica
         cat > "$bspwm_dir/bspwmrc" << 'EOF'

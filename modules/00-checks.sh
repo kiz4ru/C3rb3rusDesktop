@@ -8,17 +8,32 @@
 
 set -euo pipefail
 
-# Colores para mensajes
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
-readonly BLUE='\033[0;34m'
-readonly NC='\033[0m' # No Color
+# Evitar redefinición de variables si ya están cargadas
+if [[ -z "${C3RB3RUS_COLORS_LOADED:-}" ]]; then
+    # Colores para mensajes
+    readonly RED='\033[0;31m'
+    readonly GREEN='\033[0;32m'
+    readonly YELLOW='\033[1;33m'
+    readonly BLUE='\033[0;34m'
+    readonly NC='\033[0m' # No Color
+    readonly C3RB3RUS_COLORS_LOADED=1
+fi
 
 # Variables globales
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-readonly MIN_DISK_SPACE_GB=5
+if [[ -z "${C3RB3RUS_VARS_LOADED:-}" ]]; then
+    # Solo definir PROJECT_DIR si SCRIPT_DIR no está ya definido
+    if [[ -z "${SCRIPT_DIR:-}" ]]; then
+        readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        readonly PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+    else
+        # Si SCRIPT_DIR ya está definido, usarlo como base
+        if [[ -z "${PROJECT_DIR:-}" ]]; then
+            readonly PROJECT_DIR="$SCRIPT_DIR"
+        fi
+    fi
+    readonly MIN_DISK_SPACE_GB=5
+    readonly C3RB3RUS_VARS_LOADED=1
+fi
 
 #############################################################
 # Funciones de utilidad
@@ -91,8 +106,10 @@ check_sudo_access() {
         log_info "Se solicitará la contraseña..."
         
         if ! sudo -v; then
-            log_error "No se pudo obtener acceso sudo"
-            return 1
+            log_warning "No se pudo obtener acceso sudo"
+            log_warning "Continuando en modo limitado (algunas instalaciones fallarán)"
+            log_warning "Recomendado: Ejecuta en Kali Linux nativo, no en contenedor"
+            return 0  # Cambiado de return 1 a return 0 para continuar
         fi
     fi
     

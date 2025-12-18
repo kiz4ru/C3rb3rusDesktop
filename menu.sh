@@ -9,14 +9,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Colores
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
-readonly BLUE='\033[0;34m'
+# Cargar funciones y colores del módulo de validación
+source "$SCRIPT_DIR/modules/00-checks.sh"
+
+# Colores adicionales para el menú
 readonly CYAN='\033[0;36m'
 readonly PURPLE='\033[0;35m'
-readonly NC='\033[0m'
 
 #############################################################
 # Banner

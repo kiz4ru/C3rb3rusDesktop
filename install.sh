@@ -11,18 +11,17 @@ set -euo pipefail
 
 # Directorio del script
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly PROJECT_DIR="$SCRIPT_DIR"
 readonly MODULES_DIR="$SCRIPT_DIR/modules"
 readonly SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 readonly CONFIG_DIR="$SCRIPT_DIR/config"
 
-# Colores
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
-readonly BLUE='\033[0;34m'
+# Cargar funciones y colores del módulo de validación
+source "$MODULES_DIR/00-checks.sh"
+
+# Colores adicionales
 readonly CYAN='\033[0;36m'
 readonly PURPLE='\033[0;35m'
-readonly NC='\033[0m'
 
 # Banner ASCII
 show_banner() {
@@ -121,57 +120,88 @@ run_installation() {
     local start_time=$(date +%s)
     
     log_info "Iniciando instalación de componentes..."
-    ecSistema base (10-system.sh)
+    
+    # Sistema base (10-system.sh)
     if [[ "$components" == *"system"* ]]; then
-        [[ -f "$MODULES_DIR/10-system.sh" ]] && bash "$MODULES_DIR/10-system.sh"
+        if [[ -f "$MODULES_DIR/10-system.sh" ]]; then
+            source "$MODULES_DIR/10-system.sh"
+            main
+        fi
     fi
     
     # Pentesting (20-pentesting.sh)
     if [[ "$components" == *"pentesting"* ]]; then
-        [[ -f "$MODULES_DIR/20-pentesting.sh" ]] && bash "$MODULES_DIR/20-pentesting.sh"
+        if [[ -f "$MODULES_DIR/20-pentesting.sh" ]]; then
+            source "$MODULES_DIR/20-pentesting.sh"
+            main
+        fi
     fi
     
     # Desarrollo (30-dev.sh)
     if [[ "$components" == *"dev"* ]]; then
-        [[ -f "$MODULES_DIR/30-dev.sh" ]] && bash "$MODULES_DIR/30-dev.sh"
+        if [[ -f "$MODULES_DIR/30-dev.sh" ]]; then
+            source "$MODULES_DIR/30-dev.sh"
+            main
+        fi
     fi
     
     # bspwm base (40-bspwm.sh)
     if [[ "$components" == *"bspwm"* ]]; then
-        [[ -f "$MODULES_DIR/40-bspwm.sh" ]] && bash "$MODULES_DIR/40-bspwm.sh"
+        if [[ -f "$MODULES_DIR/40-bspwm.sh" ]]; then
+            source "$MODULES_DIR/40-bspwm.sh"
+            main
+        fi
     fi
     
     # Keybindings (41-keybinds.sh)
     if [[ "$components" == *"keybinds"* ]]; then
-        [[ -f "$MODULES_DIR/41-keybinds.sh" ]] && bash "$MODULES_DIR/41-keybinds.sh"
+        if [[ -f "$MODULES_DIR/41-keybinds.sh" ]]; then
+            source "$MODULES_DIR/41-keybinds.sh"
+            main
+        fi
     fi
     
     # Polybar (42-polybar.sh)
     if [[ "$components" == *"polybar"* ]]; then
-        [[ -f "$MODULES_DIR/42-polybar.sh" ]] && bash "$MODULES_DIR/42-polybar.sh"
+        if [[ -f "$MODULES_DIR/42-polybar.sh" ]]; then
+            source "$MODULES_DIR/42-polybar.sh"
+            main
+        fi
     fi
     
     # Picom (43-picom.sh)
     if [[ "$components" == *"picom"* ]]; then
-        [[ -f "$MODULES_DIR/43-picom.sh" ]] && bash "$MODULES_DIR/43-picom.sh"
+        if [[ -f "$MODULES_DIR/43-picom.sh" ]]; then
+            source "$MODULES_DIR/43-picom.sh"
+            main
+        fi
     fi
     
     # Zsh (50-zsh.sh)
     if [[ "$components" == *"zsh"* ]]; then
-        [[ -f "$MODULES_DIR/50-zsh.sh" ]] && bash "$MODULES_DIR/50-zsh.sh"
+        if [[ -f "$MODULES_DIR/50-zsh.sh" ]]; then
+            source "$MODULES_DIR/50-zsh.sh"
+            main
+        fi
     fi
     
     # Tweaks (60-tweaks.sh)
     if [[ "$components" == *"tweaks"* ]]; then
-        [[ -f "$MODULES_DIR/60-tweaks.sh" ]] && bash "$MODULES_DIR/60-tweaks.sh"
+        if [[ -f "$MODULES_DIR/60-tweaks.sh" ]]; then
+            source "$MODULES_DIR/60-tweaks.sh"
+            main
+        fi
     fi
     
     # Cleanup (99-cleanup.sh)
     if [[ "$components" == *"cleanup"* ]]; then
-        [[ -f "$MODULES_DIR/99-cleanup.sh" ]] && bash "$MODULES_DIR/99-cleanup.shg_warning "Módulo cleanup.sh no encontrado (será creado próximamente)"
+        if [[ -f "$MODULES_DIR/99-cleanup.sh" ]]; then
+            source "$MODULES_DIR/99-cleanup.sh"
+            main
         fi
-        echo ""
     fi
+    
+    echo ""
     
     local end_time=$(date +%s)
     local duration=$((end_time - start_time))
@@ -303,3 +333,37 @@ main() {
             components=$(echo "$components" | tr -d '"')
             ;;
     esac
+    
+    # Mostrar resumen
+    echo ""
+    log_info "═══════════════════════════════════════════════════"
+    log_info "  Componentes a instalar: $components"
+    log_info "═══════════════════════════════════════════════════"
+    echo ""
+    
+    read -p "¿Continuar con la instalación? [S/n]: " confirm
+    if [[ "$confirm" =~ ^[Nn]$ ]]; then
+        log_warning "Instalación cancelada"
+        exit 0
+    fi
+    
+    # Ejecutar instalación
+    run_installation "$components"
+    
+    # Resumen final
+    echo ""
+    log_success "═══════════════════════════════════════════════════"
+    log_success "  ¡Instalación completada!"
+    log_success "═══════════════════════════════════════════════════"
+    echo ""
+    log_info "📝 Próximos pasos:"
+    echo "  1. Cerrar sesión y seleccionar 'bspwm' en el login screen"
+    echo "  2. Presiona Super + Shift + K para ver todos los atajos"
+    echo "  3. Personaliza wallpapers en ~/.config/bspwm/wallpapers/"
+    echo ""
+    log_info "📚 Documentación completa en ~/.config/bspwm/docs/"
+    echo ""
+}
+
+# Ejecutar script principal
+main "$@"

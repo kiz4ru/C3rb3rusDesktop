@@ -8,8 +8,7 @@
 set -euo pipefail
 
 # Cargar funciones de logging
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/validation.sh"
+# SCRIPT_DIR viene de install.sh cuando se ejecuta con source
 
 #############################################################
 # Instalar Python y herramientas relacionadas

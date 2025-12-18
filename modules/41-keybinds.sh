@@ -7,9 +7,7 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-source "$SCRIPT_DIR/00-checks.sh"
+# SCRIPT_DIR y PROJECT_DIR vienen de install.sh cuando se ejecuta con source
 
 #############################################################
 # Crear configuración de sxhkd
