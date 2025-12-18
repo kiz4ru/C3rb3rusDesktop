@@ -31,26 +31,27 @@ install_python_dev() {
     
     sudo apt install -y "${python_packages[@]}" 2>&1 | grep -E "Setting up|already" || true
     
-    # Actualizar pip
-    python3 -m pip install --upgrade pip setuptools wheel
+    # Instalar pipx para herramientas Python (más seguro que pip global)
+    sudo apt install -y pipx 2>&1 | grep -E "Setting up|already" || true
+    pipx ensurepath 2>/dev/null || true
     
-    # Instalar herramientas de desarrollo Python
-    local pip_dev_tools=(
-        "virtualenv"
-        "pipenv"
-        "poetry"
-        "black"                 # Code formatter
-        "flake8"                # Linter
-        "pylint"                # Linter
-        "autopep8"              # Auto-formatter
-        "ipython"               # Enhanced REPL
-        "jupyter"               # Notebooks
-        "ptpython"              # Better REPL
+    # Instalar herramientas de desarrollo Python disponibles en repos
+    local python_dev_packages=(
+        "python3-virtualenv"
+        "python3-black"
+        "python3-flake8"
+        "python3-pylint"
+        "python3-autopep8"
+        "jupyter-core"
     )
     
     log_info "Instalando herramientas de desarrollo Python..."
-    python3 -m pip install --user "${pip_dev_tools[@]}" 2>&1 | \
-        grep -E "Successfully installed|already satisfied" || true
+    sudo apt install -y "${python_dev_packages[@]}" 2>&1 | grep -E "Setting up|already" || true
+    
+    # Instalar herramientas CLI con pipx (aisladas)
+    log_info "Instalando herramientas Python con pipx..."
+    pipx install poetry --quiet 2>/dev/null || log_info "Poetry ya instalado o falló"
+    pipx install pipenv --quiet 2>/dev/null || log_info "Pipenv ya instalado o falló"
     
     log_success "Entorno Python instalado"
 }
